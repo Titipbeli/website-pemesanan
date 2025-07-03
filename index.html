@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Titip Beli</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        color: #4caf50;
+        text-align: center;
+      }
+      .container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        margin: auto;
+      }
+      label {
+        display: block;
+        margin: 10px 0 5px;
+      }
+      input,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      .map-container {
+        margin: 20px 0;
+        height: 300px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Jasa Titip Beli</h1>
+      <p>
+        “Titip Beli, layanan yang membantu Anda berbelanja makanan favorit,
+        minuman, kebutuhan pasar, atau grosir untuk warung. Cukup pesan dari
+        rumah, kami yang belanjakan dan antar.”
+      </p>
+
+      <label for="name">Nama Pelanggan:</label>
+      <input type="text" id="name" required />
+
+      <label for="whatsapp">Nomor WhatsApp:</label>
+      <input type="text" id="whatsapp" required />
+
+      <label for="items">Daftar Barang yang Ingin Dibeli:</label>
+      <textarea id="items" rows="3" required></textarea>
+
+      <label for="storeLocation">Lokasi Toko/Pasar:</label>
+      <input type="text" id="storeLocation" required />
+
+      <label for="deliveryAddress">Alamat Pengiriman:</label>
+      <input type="text" id="deliveryAddress" required />
+
+      <div class="map-container" id="map"></div>
+      <button id="useLocation">Gunakan Lokasi Saya</button>
+
+      <label for="notes">Catatan Tambahan (opsional):</label>
+      <textarea id="notes" rows="3"></textarea>
+
+      <button id="sendWhatsApp">Kirim ke WhatsApp</button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+      let userLocation = "";
+      let map;
+      let marker;
+
+      function initMap() {
+        map = L.map("map").setView([-6.2, 106.816666], 13); // Koordinat Jakarta sebagai default
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          maxZoom: 19,
+          attribution: "© OpenStreetMap",
+        }).addTo(map);
+
+        marker = L.marker([-6.2, 106.816666]).addTo(map); // Marker default
+      }
+
+      document.getElementById("useLocation").onclick = function () {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function (position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            userLocation = `https://www.google.com/maps/@${lat},${lon},15z`;
+            map.setView([lat, lon], 13);
+            marker.setLatLng([lat, lon]);
+          });
+        } else {
+          alert("Geolocation tidak didukung oleh browser ini.");
+        }
+      };
+
+      document.getElementById("sendWhatsApp").onclick = function () {
+        const name = document.getElementById("name").value;
+        const whatsapp = document.getElementById("whatsapp").value;
+        const items = document.getElementById("items").value;
+        const storeLocation = document.getElementById("storeLocation").value;
+        const deliveryAddress =
+          document.getElementById("deliveryAddress").value;
+        const notes = document.getElementById("notes").value;
+
+        const message = `Halo, saya ingin menggunakan jasa Titip Beli.\nNama: ${name}\nNomor WA: ${whatsapp}\nDaftar Belanja: ${items}\nLokasi Toko/Pasar: ${storeLocation}\nAlamat Pengiriman: ${deliveryAddress}\nLink Lokasi Saya: ${userLocation}\nCatatan: ${notes}`;
+        const phoneNumber = "62895415979201"; // Ganti dengan nomor WhatsApp driver
+        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+          message
+        )}`;
+        window.open(url, "_blank");
+      };
+
+      initMap(); // Inisialisasi peta saat halaman dimuat
+    </script>
+  </body>
+</html>
